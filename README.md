@@ -1,4 +1,4 @@
-<img src="./img/dsd.png" hspace="30%" width="40%">
+<img src="./img/dsd.png" hspace="10%" width="80%">
 
 ## DSD: Dense-Sparse-Dense Training for Deep Neural Networks
 
