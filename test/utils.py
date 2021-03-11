@@ -6,18 +6,19 @@ import matplotlib.pyplot as plt
 
 def plot_wb(model, ranges=None):
     
-    # Take all layers except last one (because no DSD layers.)
     for i, l in enumerate(model.layers[:-1]):
         # Plot.
         fig = plt.figure(figsize=(15,5))
 
         fig.add_subplot(1,2,1)
         plt.title("weights " + l.name)
+        plt.ylim(top=20000)
         w = l.get_weights()[0].flatten()
         plt.hist(w, bins=100, range=ranges);
 
         fig.add_subplot(1,2,2)
         plt.title("biases " + l.name)
+        plt.ylim(top=20)
         b = l.get_weights()[1].flatten()
         plt.hist(b, bins=100, range=ranges);
 
