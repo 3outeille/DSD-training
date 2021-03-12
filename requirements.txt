@@ -3,3 +3,4 @@ matplotlib
 pillow
 scipy
 tensorflow
+tensorflow-probability
