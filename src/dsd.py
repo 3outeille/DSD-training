@@ -20,9 +20,10 @@ class DSDTraining(tf.keras.Model):
         self.masks = []
         
         for layer in self.model.layers:
-            w, b = layer.get_weights()
-            self.masks.append(tf.ones_like(w))
-            self.masks.append(tf.ones_like(b))
+            if "conv" in layer.name or "dense" in layer.name:
+                w, b = layer.get_weights()
+                self.masks.append(tf.ones_like(w))
+                self.masks.append(tf.ones_like(b))
         
         return self.masks
     
