@@ -20,9 +20,10 @@ class DSDTraining(tf.keras.Model):
         self.masks = []
         
         for layer in self.model.layers:
-            w, b = layer.get_weights()
-            self.masks.append(tf.ones_like(w))
-            self.masks.append(tf.ones_like(b))
+            if "conv" in layer.name or "dense" in layer.name:
+                w, b = layer.get_weights()
+                self.masks.append(tf.ones_like(w))
+                self.masks.append(tf.ones_like(b))
         
         return self.masks
     
@@ -36,12 +37,14 @@ class DSDTraining(tf.keras.Model):
     
     def apply_masks(self, trainable_vars, gradients):
         
-        for i, (wb, grad, mask) in enumerate(zip(trainable_vars, gradients, self.masks)):
-            # Weights/biases.
-            trainable_vars[i].assign(tf.multiply(wb, mask))
-            # Gradients.
-            gradients[i] = tf.multiply(grad, mask) 
-        
+        for i, (wb, grad, mask) in enumerate(zip(trainable_vars, gradients, self.masks)):      
+            # According to paper, first conv layer is ignored.
+            if i > 1:
+                # Weights/biases.
+                trainable_vars[i].assign(tf.multiply(wb, mask))
+                # Gradients.
+                gradients[i] = tf.multiply(grad, mask) 
+         
         return gradients
     
     def train_step(self, data):
@@ -72,6 +75,11 @@ class DSDTraining(tf.keras.Model):
     def call(self, x):
         x = self.model(x)
         return x
+    
+    def build_model(self):
+        x = layers.Input(shape=self.model.inputs_shape)
+        return Model(inputs=[x], outputs = self.call(x))
+
 
 class UpdateMasks(tf.keras.callbacks.Callback):
 
