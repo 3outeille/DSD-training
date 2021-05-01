@@ -1,39 +1,42 @@
-import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
-import tensorflow_probability as tfp
+import numpy as np
+import random
+import torch
 
-def plot_wb(model, ranges=None):
+def plot_wb(model, fig_path, ranges=None):
 
-    # According to paper, first conv layer is ignored.
-    for l in model.layers[1:]:
-        if "conv" in l.name or "dense" in l.name:
-          w = l.get_weights()[0].flatten()
-          b = l.get_weights()[1].flatten()
+    tmp = list(model.named_parameters())
+    layers = []
+    for i in range(0, len(tmp), 2):
+          w, b = tmp[i], tmp[i + 1]
+          if ("conv" in w[0] or "conv" in b[0]) or ("fc" in w[0] or "fc" in b[0]):
+            layers.append((w, b))
 
-          # Plot.
-          fig = plt.figure(figsize=(15,5))
+    num_rows = len(layers)
 
-          fig.add_subplot(1,2,1)
-          plt.title("weights " + l.name)
-          plt.hist(w, bins=100, range=ranges);
+    fig = plt.figure(figsize=(20, 40))
 
-          fig.add_subplot(1,2,2)
-          plt.title("biases " + l.name)
-          plt.hist(b, bins=100, range=ranges);
+    i = 1
+    for w, b in layers:
+        w_flatten = w[1].flatten().detach().cpu().numpy()
+        b_flatten = b[1].flatten().detach().cpu().numpy()
 
-def wb_non_zero_percentage(model):
-    # According to paper, first conv layer is ignored.
-    for l in model.layers[1:]:
-        if "conv" in l.name or "dense" in l.name:
-            w, b = l.get_weights()
+        fig.add_subplot(num_rows, 2, i)
+        plt.title(w[0])
+        plt.hist(w_flatten, bins=100, range=ranges);
 
-            non_zero_w = tf.math.count_nonzero(w)
-            total_w = tf.reshape(w, [-1]).shape[0]
-            res_w = (non_zero_w / total_w).numpy() * 100
+        fig.add_subplot(num_rows, 2, i + 1)
+        plt.title(b[0])
+        plt.hist(b_flatten, bins=100, range=ranges);
 
-            non_zero_b = tf.math.count_nonzero(w)
-            total_b = tf.reshape(w, [-1]).shape[0]
-            res_b = (non_zero_b / total_b).numpy() * 100
+        i += 2
+    
+    fig.tight_layout()
+    plt.savefig(fig_path)
+    plt.close()
 
-            print("Percentage of non-zero value " + l.name + ": w = {} | b = {}".format(res_w, res_b))
+def set_all_seed(seed_value=42):
+    random.seed(seed_value)
+    np.random.seed(seed_value)
+    torch.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
