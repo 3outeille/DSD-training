@@ -2,7 +2,7 @@
 
 ## DSD: Dense-Sparse-Dense Training for Deep Neural Networks
 
-Unofficial implementation of <a href="https://arxiv.org/abs/1607.04381">DSD: Dense-Sparse-Dense Training for Deep Neural Networks</a> in Tensorflow 2.
+Unofficial implementation of <a href="https://arxiv.org/abs/1607.04381">DSD: Dense-Sparse-Dense Training for Deep Neural Networks</a> in Pytorch.
 
 <img src="./img/weight-distribution.png" hspace="3%" width="90%">
 
