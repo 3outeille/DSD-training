@@ -2,5 +2,6 @@ ipykernel
 matplotlib
 pillow
 scipy
-tensorflow
-tensorflow-probability
+torch
+torchsummary
+torchvision
