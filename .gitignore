@@ -1,3 +1,6 @@
 env/
 __pycache__
 .ipynb_checkpoints
+/venv
+/src/pretrained
+/src/data
