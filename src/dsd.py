@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.nn as nn
+import numpy as np
 
 
 class DSDTraining(nn.Module):
@@ -24,7 +25,6 @@ class DSDTraining(nn.Module):
         self.reset_masks()
 
     def reset_masks(self):
-
         self.masks = []
         for w, b in self.layers:
             mask_w = torch.ones_like(w, dtype=bool)
@@ -34,12 +34,11 @@ class DSDTraining(nn.Module):
         return self.masks
 
     def update_masks(self):
-
         for i, (w, b) in enumerate(self.layers):
-            q_w = torch.quantile(torch.abs(w), q=self.sparsity)
+            q_w = np.quantile(torch.abs(w).detach().numpy(), q=self.sparsity)
             mask_w = torch.where(torch.abs(w) < q_w, True, False)
 
-            q_b = torch.quantile(torch.abs(b), q=self.sparsity)
+            q_b = np.quantile(torch.abs(b).detach().numpy(), q=self.sparsity)
             mask_b = torch.where(torch.abs(b) < q_b, True, False)
 
             self.masks[i] = (mask_w, mask_b)
